@@ -1,0 +1,36 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuário
+model User {
+  id        Int      @id @default(autoincrement()) // ID numérico automático (1, 2, 3...)
+  email     String   @unique                       // Email não pode repetir
+  password  String                                 // Senha (será criptografada depois)
+  name      String
+  createdAt DateTime @default(now())               // Data de criação automática
+
+  // Relacionamento: Um usuário pode ter várias Tarefas
+  tasks     Task[]
+}
+
+// Modelo de Tarefa (Card)
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?                            // O "?" significa que pode ser vazio
+  status      String   @default("OPEN")          // OPEN, PENDING, DONE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt                // Atualiza a data sempre que editar
+
+  // Relacionamento: Cada tarefa pertence a um Usuário
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+}
