@@ -1,5 +1,3 @@
-// backend/prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,28 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelo de Usuário
 model User {
-  id        Int      @id @default(autoincrement()) // ID numérico automático (1, 2, 3...)
-  email     String   @unique                       // Email não pode repetir
-  password  String                                 // Senha (será criptografada depois)
+  id        Int      @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())               // Data de criação automática
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  
 
-  // Relacionamento: Um usuário pode ter várias Tarefas
-  tasks     Task[]
+  tasks     Task[]   
 }
 
-// Modelo de Tarefa (Card)
+
 model Task {
   id          Int      @id @default(autoincrement())
-  title       String
-  description String?                            // O "?" significa que pode ser vazio
-  status      String   @default("OPEN")          // OPEN, PENDING, DONE
+  title       String   // Título da tarefa
+  description String?  // Descrição (o "?" significa que é opcional)
+  isCompleted Boolean  @default(false) // Começa sempre como "não concluída"
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt                // Atualiza a data sempre que editar
 
-  // Relacionamento: Cada tarefa pertence a um Usuário
+  // Relacionamento: Toda tarefa pertence a UM usuário
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
 }

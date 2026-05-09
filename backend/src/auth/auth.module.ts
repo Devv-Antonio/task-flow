@@ -2,19 +2,22 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { PrismaModule } from '../prisma/prisma.module'; 
+import { PassportModule } from '@nestjs/passport'; 
+import { PrismaModule } from '../prisma/prisma.module';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     PrismaModule,
-    // Configurando a "máquina de crachás" (JWT)
+    PassportModule, 
     JwtModule.register({
-      global: true, 
-      secret: 'MINHA_CHAVE_SECRETA_SUPER_SEGURA', // Assinatura que impede falsificações
-      signOptions: { expiresIn: '1d' }, // O crachá expira em 1 dia (24 horas)
+      global: true,
+      secret: 'MINHA_CHAVE_SECRETA_SUPER_SEGURA',
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
+  exports: [JwtStrategy, PassportModule], // <-- NOVO: Exportamos para outros módulos poderem usar!
 })
 export class AuthModule {}
